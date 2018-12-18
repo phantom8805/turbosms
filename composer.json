@@ -1,5 +1,5 @@
 {
-	"name"         : "VikkiUser/turbosms",
+	"name"         : "vikki-user/turbosms",
 	"description"  : "TurboSMS Notification notifications driver for Laravel 5.7+.",
 	"keywords"     : [
 		"laravel",
