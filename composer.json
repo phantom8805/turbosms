@@ -1,13 +1,13 @@
 {
-	"name"         : "laravel-notification-channels/turbosms",
-	"description"  : "TurboSMS Notification notifications driver for Laravel 5.5+.",
+	"name"         : "vikki-user/turbosms",
+	"description"  : "TurboSMS Notification notifications driver for Laravel 5.7+.",
 	"keywords"     : [
 		"laravel",
 		"notifications",
 		"turbosms",
 		"sms"
 	],
-	"homepage"     : "https://github.com/laravel-notification-channels/turbosms",
+	"homepage"     : "https://github.com/VikkiUser/turbosms",
 	"license"      : "MIT",
 	"authors"      : [
 		{
@@ -18,9 +18,8 @@
 		}
 	],
 	"require"      : {
-		"php"                      : ">=7.1.0",
-		"illuminate/notifications" : "5.5.*",
-		"illuminate/support"       : "5.5.*"
+		"php" : ">=7.1.0",
+		"laravel/framework" : "5.7.*"
 	},
 	"require-dev"  : {
 		"mockery/mockery" : "^0.9.5",
