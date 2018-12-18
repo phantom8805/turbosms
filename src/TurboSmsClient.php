@@ -12,6 +12,12 @@ class TurboSmsClient
     /** @var string */
     public static $host = 'http://turbosms.in.ua/api/wsdl.html';
 
+    /** @var bool */
+    public $debug;
+
+    /** @var string */
+    public $sender;
+
     /** @var string */
     protected $login;
 
@@ -27,27 +33,32 @@ class TurboSmsClient
     /** @var array */
     private $lastResults = [];
 
-    public const AUTH_SUCCESSFUL = 'Вы успешно авторизировались';
-    public const AUTH_ERROR_NEED_MORE_PARAMS = 'Не достаточно параметров для выполнения функции';
-    public const AUTH_ERROR_WRONG_CREDENTIALS = 'Неверный логин или пароль';
-    public const AUTH_ERROR_ACCOUNT_NOT_ACTIVATED = 'Ваша учётная запись не активирована, свяжитесь с администрацией';
-    public const AUTH_ERROR_ACCOUNT_BLOCKED = 'Ваша учётная запись заблокирована за нарушения, свяжитесь с администрацией';
-    public const AUTH_ERROR_ACCOUNT_DISABLED = 'Ваша учётная запись отключена, свяжитесь с администрацией';
+    public const AUTH_SUCCESSFUL = 'You are successfully logged in.';
+    public const AUTH_ERROR_NEED_MORE_PARAMS = 'Not enough parameters to perform the function.';
+    public const AUTH_ERROR_WRONG_CREDENTIALS = 'Wrong login or password.';
+    public const AUTH_ERROR_ACCOUNT_NOT_ACTIVATED = 'Your account is not activated, please contact the administration.';
+    public const AUTH_ERROR_ACCOUNT_BLOCKED = 'Your account has been blocked for violations, please contact the administration.';
+    public const AUTH_ERROR_ACCOUNT_DISABLED = 'Your account is disabled, please contact the administration.';
 
-    public const UNAUTHORISED = 'Вы не авторизированы';
-    public const SUCCESSFUL_SEND = 'Сообщения успешно отправлены';
+    public const UNAUTHORISED = 'Unauthorized';
+    public const SUCCESSFUL_SEND = 'Message send successful';
+    public const SUCCESSFUL_SEND_DEBUG = 'Message send in debug mode success';
 
     /**
      * TurboSmsClient constructor.
      *
      * @param string $login
      * @param string $password
+     * @param string $sender
+     * @param bool   $debug
      */
-    public function __construct(string $login, string $password)
+    public function __construct(string $login, string $password, string $sender = 'Sender', bool $debug = false)
     {
         $this->login = $login;
         $this->password = $password;
-        $this->client = new SoapClient( self::$host );
+        $this->sender = $sender;
+        $this->debug = $debug;
+        $this->client = new SoapClient(self::$host);
     }
 
     /**
@@ -59,32 +70,36 @@ class TurboSmsClient
      * @throws BalanceException
      * @throws CouldNotSendNotification
      */
-    public function send(array $to, string $message, string $sender) : void
+    public function send(array $to, string $message, string $sender): void
     {
-        // normalizing input data
+        if(!$this->debug) {
+            // normalizing input data
 
-        array_walk( $to, function (&$value) {
-            $value = '+'.preg_replace( '/\D/', '', $value );
-        } );
+            array_walk($to, function (&$value) {
+                $value = '+' . preg_replace('/\D/', '', $value);
+            });
 
-        $recipients = array_filter( $to, function ($value) {
-            return preg_match( '/\+\d{12}/', $value );
-        } );
+            $recipients = array_filter($to, function ($value) {
+                return preg_match('/\+\d{12}/', $value);
+            });
 
-        $message = trim( $message );
-        $sender = trim( $sender );
+            $message = trim($message);
+            $sender = trim($sender);
 
-        // basic versifying and connecting
+            // basic versifying and connecting
 
-        $this->verify( $recipients, $message, $sender )->connect()->checkBalance( \count( $recipients ) );
+            $this->verify($recipients, $message, $sender)->connect()->checkBalance(\count($recipients));
 
-        // sending notification and response handle
+            // sending notification and response handle
 
-        $this->handleProviderResponses( $this->client->SendSMS( [
-            'destination' => implode( ',', $recipients ),
-            'text'        => $message,
-            'sender'      => $sender,
-        ] )->SendSMSResult->ResultArray );
+            $this->handleProviderResponses($this->client->SendSMS([
+                'destination' => implode(',', $recipients),
+                'text'        => $message,
+                'sender'      => $sender,
+            ])->SendSMSResult->ResultArray);
+        } else {
+            $this->lastResults = [self::SUCCESSFUL_SEND];
+        }
     }
 
     /**
@@ -95,17 +110,17 @@ class TurboSmsClient
      * @return TurboSmsClient
      * @throws CouldNotSendNotification
      */
-    public function verify(array $to, string $message, string $sender) : self
+    public function verify(array $to, string $message, string $sender): self
     {
-        if ( \count( $to ) < 1 ) {
+        if(\count($to) < 1) {
             throw CouldNotSendNotification::RecipientRequired();
         }
 
-        if ( empty( $message ) ) {
+        if(empty($message)) {
             throw CouldNotSendNotification::MessageRequired();
         }
 
-        if ( empty( $sender ) ) {
+        if(empty($sender)) {
             throw CouldNotSendNotification::SenderRequired();
         }
 
@@ -118,32 +133,32 @@ class TurboSmsClient
      * @return TurboSmsClient
      * @throws AuthException
      */
-    public function connect() : self
+    public function connect(): self
     {
-        if ( $this->connected ) {
+        if($this->connected) {
             return $this;
         }
 
-        $authResponse = $this->client->Auth( [
+        $authResponse = $this->client->Auth([
             'login'    => $this->login,
             'password' => $this->password,
-        ] )->AuthResult;
+        ])->AuthResult;
 
-        switch ( $authResponse ) {
+        switch ($authResponse) {
             case self::AUTH_ERROR_NEED_MORE_PARAMS:
-                throw AuthException::NeedMoreParams( $authResponse );
+                throw AuthException::NeedMoreParams($authResponse);
             case self::AUTH_ERROR_WRONG_CREDENTIALS:
-                throw AuthException::WrongCredentials( $authResponse );
+                throw AuthException::WrongCredentials($authResponse);
             case self::AUTH_ERROR_ACCOUNT_NOT_ACTIVATED:
-                throw AuthException::AccountError( $authResponse );
+                throw AuthException::AccountError($authResponse);
             case self::AUTH_ERROR_ACCOUNT_BLOCKED:
-                throw AuthException::AccountError( $authResponse );
+                throw AuthException::AccountError($authResponse);
             case self::AUTH_ERROR_ACCOUNT_DISABLED:
-                throw AuthException::AccountError( $authResponse );
+                throw AuthException::AccountError($authResponse);
         }
 
-        if ( $authResponse !== self::AUTH_SUCCESSFUL ) {
-            throw AuthException::serviceRespondedWithAnError( $authResponse );
+        if($authResponse !== self::AUTH_SUCCESSFUL) {
+            throw AuthException::serviceRespondedWithAnError($authResponse);
         }
 
         $this->connected = true;
@@ -157,17 +172,17 @@ class TurboSmsClient
      * @return TurboSmsClient
      * @throws BalanceException
      */
-    public function checkBalance(int $credits) : self
+    public function checkBalance(int $credits): self
     {
         $balanceResponse = $this->client->GetCreditBalance()->GetCreditBalanceResult;
 
-        if ( $balanceResponse === self::UNAUTHORISED ) {
+        if($balanceResponse === self::UNAUTHORISED) {
             throw BalanceException::UnAuthorised();
         }
 
-        $balanceResponse = (int) $balanceResponse;
-        if ( $balanceResponse < $credits ) {
-            throw BalanceException::InsufficientBalance( $balanceResponse );
+        $balanceResponse = (int)$balanceResponse;
+        if($balanceResponse < $credits) {
+            throw BalanceException::InsufficientBalance($balanceResponse);
         }
 
         return $this;
@@ -179,10 +194,10 @@ class TurboSmsClient
      * @return TurboSmsClient
      * @throws CouldNotSendNotification
      */
-    private function handleProviderResponses(array $responses) : self
+    private function handleProviderResponses(array $responses): self
     {
-        if ( $responses[ 0 ] !== self::SUCCESSFUL_SEND ) {
-            throw CouldNotSendNotification::serviceRespondedWithAnError( $responses[ 0 ] );
+        if($responses[0] !== self::SUCCESSFUL_SEND) {
+            throw CouldNotSendNotification::serviceRespondedWithAnError($responses[0]);
         }
 
         $this->lastResults = $responses;
@@ -193,7 +208,7 @@ class TurboSmsClient
     /**
      * @return array
      */
-    public function getLastResults() : array
+    public function getLastResults(): array
     {
         return $this->lastResults;
     }
