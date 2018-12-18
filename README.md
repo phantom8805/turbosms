@@ -1,11 +1,11 @@
-# TurboSMS notifications channel for Laravel 5.5
+# TurboSMS notifications channel for Laravel 5.7+
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Build Status](https://img.shields.io/travis/laravel-notification-channels/turbosms/master.svg?style=flat-square)](https://travis-ci.org/laravel-notification-channels/turbosms)
 [![StyleCI](https://styleci.io/repos/103665228/shield)](https://styleci.io/repos/103665228)
 
 
-This package makes it easy to send notifications using [turbosms.ua](https://turbosms.ua/) with Laravel 5.5.
+This package makes it easy to send notifications using [turbosms.ua](https://turbosms.ua/) with Laravel 5.7+.
 
 ## Contents
 
