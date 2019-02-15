@@ -37,4 +37,14 @@ class CouldNotSendNotification extends \Exception
     {
         return new static( 'Notification was not sent. Message must be defined.', 400 );
     }
+
+    /**
+     * @param string $message
+     *
+     * @return static
+     */
+    public static function InvalidResponse(string $message)
+    {
+        return new static( "Notification was not sent. Message: {$message}", 424 );
+    }
 }

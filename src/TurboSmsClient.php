@@ -93,11 +93,17 @@ class TurboSmsClient
 
             // sending notification and response handle
 
-            $this->handleProviderResponses($this->client->SendSMS([
+            $result = $this->client->SendSMS([
                 'destination' => implode(',', $recipients),
                 'text'        => $message,
                 'sender'      => $sender,
-            ])->SendSMSResult->ResultArray);
+            ])->SendSMSResult->ResultArray;
+
+            if(!is_array($result) && is_string($result)){
+                throw CouldNotSendNotification::InvalidResponse($result);
+            }
+
+            $this->handleProviderResponses($result);
         } else {
             $this->lastResults = [self::SUCCESSFUL_SEND];
         }
