@@ -1,7 +1,7 @@
 # TurboSMS notifications channel for Laravel 5.7+
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/laravel-notification-channels/turbosms/master.svg?style=flat-square)](https://travis-ci.org/laravel-notification-channels/turbosms)
+[![Build Status](https://img.shields.io/travis/VikkiUser/turbosms/master.svg?style=flat-square)](https://travis-ci.org/VikkiUser/turbosms)
 [![StyleCI](https://styleci.io/repos/103665228/shield)](https://styleci.io/repos/103665228)
 
 

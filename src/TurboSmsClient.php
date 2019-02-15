@@ -33,15 +33,16 @@ class TurboSmsClient
     /** @var array */
     private $lastResults = [];
 
-    public const AUTH_SUCCESSFUL = 'You are successfully logged in.';
-    public const AUTH_ERROR_NEED_MORE_PARAMS = 'Not enough parameters to perform the function.';
-    public const AUTH_ERROR_WRONG_CREDENTIALS = 'Wrong login or password.';
-    public const AUTH_ERROR_ACCOUNT_NOT_ACTIVATED = 'Your account is not activated, please contact the administration.';
-    public const AUTH_ERROR_ACCOUNT_BLOCKED = 'Your account has been blocked for violations, please contact the administration.';
-    public const AUTH_ERROR_ACCOUNT_DISABLED = 'Your account is disabled, please contact the administration.';
+    public const AUTH_SUCCESSFUL = 'Вы успешно авторизировались';
+    public const AUTH_ERROR_NEED_MORE_PARAMS = 'Не достаточно параметров для выполнения функции';
+    public const AUTH_ERROR_WRONG_CREDENTIALS = 'Неверный логин или пароль';
+    public const AUTH_ERROR_ACCOUNT_NOT_ACTIVATED = 'Ваша учётная запись не активирована, свяжитесь с администрацией';
+    public const AUTH_ERROR_ACCOUNT_BLOCKED = 'Ваша учётная запись заблокирована за нарушения, свяжитесь с администрацией';
+    public const AUTH_ERROR_ACCOUNT_DISABLED = 'Ваша учётная запись отключена, свяжитесь с администрацией';
 
-    public const UNAUTHORISED = 'Unauthorized';
-    public const SUCCESSFUL_SEND = 'Message send successful';
+    public const UNAUTHORISED = 'Вы не авторизированы';
+    public const SUCCESSFUL_SEND = 'Сообщения успешно отправлены';
+
     public const SUCCESSFUL_SEND_DEBUG = 'Message send in debug mode success';
 
     /**
